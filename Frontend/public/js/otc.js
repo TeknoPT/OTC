@@ -40,6 +40,7 @@ function loginToPhantasma(providerHint) {
     );
 }
 
+// Connect to Wallet ( Login )
 function connectToWallet(providerHint){
     link.login(
         function (success) {
@@ -49,7 +50,6 @@ function connectToWallet(providerHint){
                 updateOffers();
                 loadUserData();
             }else {
-                //link.hideModal();
                 logOut();
             }
         },
@@ -59,6 +59,7 @@ function connectToWallet(providerHint){
     );
 }
 
+// Logout from the Dapp
 function logOut() {
     $.ajax({
         url: "logout",
@@ -72,50 +73,8 @@ function logOut() {
     });
 }
 
-function getBalance(symbol) {
-    if (!link.account) {
-        return 0;
-    }
-    let balances = link.account.balances;
-    var i;
-    for (i = 0; i < balances.length; i++) {
-        var entry = balances[i];
-        if (entry.symbol == symbol) {
-            return entry.value / Math.pow(10, entry.decimals);
-        }
-    }
-    return 0;
-}
-
-function convertToBigInt(symbol, amount) {
-    if (!link.account) {
-        return 0;
-    }
-    let balances = link.account.balances;
-    var i;
-    for (i = 0; i < balances.length; i++) {
-        var entry = balances[i];
-        if (entry.symbol == symbol) {
-            return Math.floor(amount * Math.pow(10, entry.decimals));
-        }
-    }
-    return 0;
-}
-
-function loadUserData(){
-    $("#userWalletAddress").html(link.account.address);
-    $("#userSOULAmmount").html(getBalance("SOUL"));
-    $("#userKCALAmmount").html(getBalance("KCAL"));
-}
-
-function changeUIs(){
-    $("#btn-login").toggle();
-    $("#btn-logout").toggle();
-    $("#userDetails").toggle();
-}
-
-function confirmLogOut()
-{
+// Confirmation box Logout
+function confirmLogOut() {
 	bootbox.confirm({
         title: "Logout",
         message: "Do you want to disconnect from "+myProvider+"?",
@@ -137,7 +96,98 @@ function confirmLogOut()
 	});
 }
 
-function updateOffers(){
+// Get User Balances by Symbol
+function getBalance(symbol) {
+    if (!link.account) {
+        return 0;
+    }
+    let balances = link.account.balances;
+    var i;
+    for (i = 0; i < balances.length; i++) {
+        var entry = balances[i];
+        if (entry.symbol == symbol) {
+            return entry.value / Math.pow(10, entry.decimals);
+        }
+    }
+    return 0;
+}
+
+// Get the decimals for the given Symbol
+function GetDecimals(symbol) {
+	let result = 0;
+
+	switch(symbol){
+        case "GOATI": 
+            result = 3;
+            break;
+		case "SOUL":
+        case "GAS":
+        case "GM":
+			result = 8;
+			break;
+		case "KCAL":
+			result = 10;
+			break; 
+		case "ETH":
+		case "BNB":
+        case "DAI":
+        case "HOD":
+			result = 18;
+			break; 
+		case "NEO":
+        case "MKNI":
+			result = 0;
+			break; 
+		case "USDT":
+        case "USDC":
+			result = 6;
+			break;
+
+	}
+	return result;
+}
+
+// Convert to big Int
+function convertToBigInt(symbol, amount) {
+    if (!link.account) {
+        return 0;
+    }
+    let balances = link.account.balances;
+    var i;
+    for (i = 0; i < balances.length; i++) {
+        var entry = balances[i];
+        if (entry.symbol == symbol) {
+            return Math.floor(amount * Math.pow(10, entry.decimals));
+        }
+    }
+    return 0;
+}
+
+function LoadUserBalances(){
+    let listBalances = "";
+    let convertedValue = 0;
+    link.account.balances.forEach(function(item, index){ 
+        console.log(item);
+        convertedValue = item.value / Math.pow(10, item.decimals);
+        listBalances += `<li class="list-group-item bg-transparent">${convertedValue}&nbsp;<b>${item.symbol}</b></li>`;
+    });
+    $("#balances_list").html(listBalances);
+}
+
+// Load User Data
+function loadUserData(){
+    $("#userWalletAddress").html(link.account.address);
+    LoadUserBalances();
+}
+
+function changeUIs(){
+    $("#btn-login").toggle();
+    $("#btn-logout").toggle();
+    $("#userDetails").toggle();
+}
+
+// Update Offers
+function updateOffers() {
     $.ajax({
 		type: 'GET',
 		url: '/offers', 
@@ -148,24 +198,7 @@ function updateOffers(){
 	});
 }
 
-//function getOffersAPI(){
-//    if(!link.account){
-//        return 0;
-//    } 
-//
-//    var sb = new ScriptBuilder();
-//    var myScript = sb.
-//        callContract("exchange", "GetOTC", []).
-//        endScript();
-//
-//    link.invokeRawScript("main", myScript, payload, (script) =>
-//    {
-//        console.log(script);
-//        console.log(script.result);
-//        console.log(script.result.result);
-//    });
-//}
-
+// Ftech user info
 function updateUserData(){
     if(!link.account){
         return 0;
@@ -312,15 +345,18 @@ function createOfferApi(data){
     
     let sellSymbol = String(data[1].value);
     let buySymbol = String(data[3].value);
-    let sellAmount = String(convertToBigInt(sellSymbol, data[0].value));
-    let buyAmmount = String(convertToBigInt(buySymbol, data[2].value));
+    //let sellAmount = String(convertToBigInt(sellSymbol, data[0].value));
+    //let buyAmmount = String(convertToBigInt(buySymbol, data[2].value));
+    let sellAmount = String(data[0].value * Math.pow(10, GetDecimals(sellSymbol)));
+    let buyAmount = String(data[2].value * Math.pow(10, GetDecimals(buySymbol)));
+    console.log(sellAmount," - ", buyAmount)
     let address = String(link.account.address);
 
     var sb = new ScriptBuilder();
     var myScript = sb.
         allowGas(address).
         callContract("exchange", "OpenOTCOrder", [address, 
-        sellSymbol, buySymbol, buyAmmount, sellAmount]).
+        sellSymbol, buySymbol, buyAmount, sellAmount]).
         spendGas(address).
         endScript();
     
@@ -340,7 +376,7 @@ $(document).ready(function(){
     $("#sellSymbol").on("change", function(e) {
         let value = $(this).val();
         
-        if (value == "KCAL" || value == "SOUL")
+        if (value != $("#buySymbol").val() )
         {
             sellEnabled = true;
             if (buyEnabled)
@@ -360,7 +396,7 @@ $(document).ready(function(){
 
     $("#buySymbol").on("change", function(e) {
         let value = $(this).val();
-        if (value == "KCAL" || value == "SOUL")
+        if (value != $("#sellSymbol").val())
         {
             buyEnabled = true;
             

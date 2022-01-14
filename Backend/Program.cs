@@ -41,8 +41,14 @@ namespace Phantasma.Docs
 
     class Program
     {
+
         const string LanguageHeader = "Accept-Language";
         static SDK.API phantasmaAPI;
+
+        const float ONE_MIN = 60f;
+        const float TEN_MIN = 600f;
+        const float HALF_AN_HOUR = 1800f;
+        const float ONE_HOUR = 3600f;
 
         static string DetectLanguage(HTTPRequest request)
         {
@@ -262,15 +268,23 @@ namespace Phantasma.Docs
                 running = false;
             };
 
+
+            float time = 0;
             while (running)
             {
-                Thread.Sleep(500);
+                Thread.Sleep(1000); // 1000m = 1sec 
+                time++;
+                if (time <= HALF_AN_HOUR)
+                    GetAllOTC();
             }
         }
+
         private static void GetAllOTC()
         {
             offers.Clear();
-            var myScript = new ScriptBuilder().CallContract(NativeContractKind.Exchange.GetContractName(), "GetOTC").EndScript();
+            var myScript = new ScriptBuilder()
+                .CallContract(NativeContractKind.Exchange.GetContractName(), "GetOTC")
+                .EndScript();
             var scriptStr = Base16.Encode(myScript);
             phantasmaAPI.InvokeRawScript(DomainSettings.RootChainName, scriptStr, (script) =>
             {
@@ -291,8 +305,25 @@ namespace Phantasma.Docs
         {
             switch (symbol)
             {
-                case "SOUL": return 8;
-                case "KCAL": return 10;
+                case "GOATI":
+                    return 3;
+                case "SOUL":
+                case "GAS":
+                case "GM":
+                    return 8;
+                case "KCAL": 
+                    return 10;
+                case "BNB": 
+                case "ETH": 
+                case "DAI":
+                case "HOD":
+                    return 18;
+                case "NEO": 
+                case "MKNI":
+                    return 0;
+                case "USDT": 
+                case "USDC":
+                    return 6;
                 default: throw new System.Exception("Unknown decimals for " + symbol);
             }
         }

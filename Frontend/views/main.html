@@ -85,16 +85,21 @@
         </section>
 
         <!-- User Details Section -->
-        <section class="fixed-bottom" style="display: none;" id="userDetails">
-            <div class="col-md-4 col-lg-3 float-right userDetails">
+        <section class="position-fixed" style="display: none;" id="userDetails">
+            <div class="userDetails">
                 <div class="col-md-12 col-lg-12">
-                    <h4 class="text-center">User Details</h4>
-                    <p class="text-right"><small id="userWalletAddress"></small> - Address</p>
-                    <p class="text-right"><span id="userSOULAmmount"></span> - SOUL</p>
-                    <p class="text-right"><span id="userKCALAmmount"></span> - KCAL</p>
+                    <h4 class="text-center"><b>User Details</b></h4>
+                    <hr style="background-color: white;"/>
+                    <h6><b>Address</b></h6>
+                    <p><small id="userWalletAddress"></small></p>
+                    <br>
+
+                    <h6><b>Balances</b></h6>
+                    <ul id="balances_list" class="list-group">
+                    </ul>
+                    <br />
                 </div>
-                <div class="col-md-12 col-lg-12 float-right">
-                    
+                <div class="col-md-12 col-lg-12">
                     <button type="button" class="btn btn-primary btn-block" onclick="openCreateOffer()">Create new offer</button>
                 </div>
             </div>
@@ -201,13 +206,24 @@
                                     <div class="form-group row">
                                         <label for="inputPassword" class="col-sm-2 col-form-label">Sell</label>
                                         <div class="col-sm-5">
-                                            <input type="number" class="form-control-plaintext" id="sellAmount" name="sellAmount" value="10">
+                                            <input type="number" class="form-control-plaintext" id="sellAmount" name="sellAmount" value="10" step="any">
                                         </div>
                                         <div class="col-sm-5">
                                             <select name="sellSymbol" class="custom-select mr-sm-2" id="sellSymbol">
                                                 <option selected>Choose...</option>
                                                 <option value="SOUL">SOUL</option>
                                                 <option value="KCAL">KCAL</option>
+                                                <option value="GOATI">GOATI</option>
+                                                <option value="GM">GM</option>
+                                                <option value="MKNI">MKNI</option>
+                                                <option value="ETH">ETH</option>
+                                                <option value="BNB">BNB</option>
+                                                <option value="HOD">HOD</option>
+                                                <option value="NEO">NEO</option>
+                                                <option value="GAS">GAS</option>
+                                                <option value="USDT">USDT</option>
+                                                <option value="USDC">USDC</option>
+                                                <option value="DAI">DAI</option>
                                             </select>
                                         </div>
                                     </div>
@@ -215,13 +231,24 @@
                                     <div class="form-group row">
                                         <label for="inputPassword" class="col-sm-2 col-form-label">For</label>
                                         <div class="col-sm-5">
-                                            <input type="number" class="form-control-plaintext" id="buyAmount" name="buyAmount" value="10">
+                                            <input type="number" class="form-control-plaintext" id="buyAmount" name="buyAmount" value="10" step="any">
                                         </div>
                                         <div class="col-sm-5">
                                             <select name="buySymbol" class="custom-select mr-sm-2" id="buySymbol">
                                                 <option selected>Choose...</option>
                                                 <option value="SOUL">SOUL</option>
                                                 <option value="KCAL">KCAL</option>
+                                                <option value="GOATI">GOATI</option>
+                                                <option value="GM">GM</option>
+                                                <option value="MKNI">MKNI</option>
+                                                <option value="ETH">ETH</option>
+                                                <option value="BNB">BNB</option>
+                                                <option value="HOD">HOD</option>
+                                                <option value="NEO">NEO</option>
+                                                <option value="GAS">GAS</option>
+                                                <option value="USDT">USDT</option>
+                                                <option value="USDC">USDC</option>
+                                                <option value="DAI">DAI</option>
                                             </select>
                                         </div>
                                     </div>
